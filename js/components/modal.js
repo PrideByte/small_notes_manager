@@ -77,17 +77,37 @@ export default class Modal extends Element {
     updatehandler = (e) => {
         e.preventDefault();
         const newData = {};
+        let errors = false;
         if (this.data) {
             this.data.forEach(([name]) => {
                 if (!this.fieldsToEdit.includes(name)) return;
-                newData[name] = this.form.element.querySelector(`[name=${name}]`).value;
+                const currentElement = this.form.element.querySelector(`[name=${name}]`);
+                const value = currentElement.value;
+                if (!value) {
+                    currentElement.classList.add('notes__modal-error');
+                    currentElement.addEventListener('focus', function (e) {this.classList.remove('notes__modal-error')}, {once: true});
+                    errors = true;
+                } else {
+                    newData[name] = value;
+                }
+                // newData[name] = this.form.element.querySelector(`[name=${name}]`).value;
             });
         } else {
             this.fieldsToEdit.forEach(name => {
                 if (!this.fieldsToEdit.includes(name)) return;
-                newData[name] = this.form.element.querySelector(`[name=${name}]`).value;
+                const currentElement = this.form.element.querySelector(`[name=${name}]`);
+                const value = currentElement.value;
+                if (!value) {
+                    currentElement.classList.add('notes__modal-error');
+                    currentElement.addEventListener('focus', function (e) {this.classList.remove('notes__modal-error')}, {once: true});
+                    errors = true;
+                } else {
+                    newData[name] = value;
+                }
+                // newData[name] = this.form.element.querySelector(`[name=${name}]`).value;
             });
         }
+        if (errors) return;
         this.onUpdate(newData);
         this.cancelhandler(e);
     }
