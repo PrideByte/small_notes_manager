@@ -27,7 +27,7 @@ export class DataModel {
     }
 
     foundDates() {
-        this.dates = this.content.match(/(?:[0-2]\d|3[0-1]|(?<=\D)\d)\/(?:0?\d|1[0-2])\/\d{1,4}/g) ?? [];
+        this.dates = this.content.match(/(?:(?<=\D)(?:[0-2]\d|3[0-1])|(?<=\D)\d)\/(?:0?\d|1[0-2])\/\d{1,4}(?=\D)|(?:(?<=\D)(?:[0-2]\d|3[0-1])|(?<=\D)\d)\.(?:0?\d|1[0-2])\.\d{1,4}(?=\D)/g) ?? [];
     }
 
     switchArchivedStatus() {
@@ -53,17 +53,19 @@ export class DataArray {
         this.onArchivedDataUpdate = new Signal();
 
         this.values = rawData.reduce((newData, dataElement) => {
-            const newElement = new DataModel(dataElement);
-            newElement.onUpdate.addListener((e) => {this.onUpdate.emit(e)});
-            newData.push(newElement);
+            newData.push(this.createNewItem(dataElement));
             return newData;
         }, []);
     }
 
-    addElement(newData) {
+    createNewItem(newData) {
         const newItem = new DataModel(newData);
         newItem.onUpdate.addListener((e) => {this.onUpdate.emit(e)});
-        this.values.push(newItem);
+        return newItem;
+    }
+
+    addElement(newData) {
+        this.values.push(this.createNewItem(newData));
         this.onUpdate.emit({
             type: 'update',
             element: newData

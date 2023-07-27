@@ -31,7 +31,7 @@ export default class NotesApplication extends Element {
 
         this.makeMainSection();
         this.makeNewNoteButton();
-        // this.makeStatisticsSections();
+        this.makeStatisticsSections();
         this.makeArchiveSection();
     }
 
@@ -64,7 +64,7 @@ export default class NotesApplication extends Element {
     }
 
     makeArchiveTable() {
-        this.archivedTable = this.createTable(this.archivedSection.element, this.archivedData);
+        this.archivedTable = this.createTable(this.archivedSection.element, this.archivedData, true);
         this.data.onArchivedDataUpdate.addListener(this.archivedTableDataUpdate);
     }
 
@@ -73,12 +73,13 @@ export default class NotesApplication extends Element {
         this.archivedTable.checkData();
     }
 
-    createTable(parent, data) {
+    createTable(parent, data, archived = false) {
         return new TableElement({
             parent,
             element: 'ul',
             classNames: 'notes__list',
-            dataFieldsToShow: ['name', 'created', 'category', 'content', 'dates']
+            dataFieldsToShow: ['name', 'created', 'category', 'content', 'dates'],
+            archived
         }, data, {
             remove: (dataElement) => {
                 this.data.removeElement(dataElement);
@@ -99,6 +100,10 @@ export default class NotesApplication extends Element {
                 this.data.addElement(newElement);
             });
         });
+    }
+
+    makeStatisticsSections() {
+
     }
 
     sortData() {

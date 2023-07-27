@@ -90,7 +90,6 @@ export default class Modal extends Element {
                 } else {
                     newData[name] = value;
                 }
-                // newData[name] = this.form.element.querySelector(`[name=${name}]`).value;
             });
         } else {
             this.fieldsToEdit.forEach(name => {
@@ -104,7 +103,6 @@ export default class Modal extends Element {
                 } else {
                     newData[name] = value;
                 }
-                // newData[name] = this.form.element.querySelector(`[name=${name}]`).value;
             });
         }
         if (errors) return;

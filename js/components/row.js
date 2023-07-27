@@ -6,6 +6,7 @@ export default class TableRow extends Element {
         super(options);
         this.header = options.header ?? false;
         this.data = data;
+        this.archived = options.archived;
         this.cells = [];
         this.handlers = handlers ?? null;
 
@@ -53,7 +54,7 @@ export default class TableRow extends Element {
         this.archiveButton = new Element({
             parent: this.buttonsRow.element,
             element: 'button',
-            htmlContent: 'Archive note',
+            htmlContent: this.archived ? 'Remove from archive' : 'Archive note',
             classNames: 'notes__buttons-archive'
         });
         this.archiveButton.addEvent('onclick', (e) => {

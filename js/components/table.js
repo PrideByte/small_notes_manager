@@ -5,6 +5,7 @@ export default class TableElement extends Element {
     constructor(options, data, handlers) {
         super(options);
         this.data = data;
+        this.archived = options.archived;
         this.handlers = handlers ?? null;
 
         this.dataFieldsToShow = options.dataFieldsToShow;
@@ -36,7 +37,8 @@ export default class TableElement extends Element {
         this.newElement = new TableRow({
             parent: this.element,
             element: 'li',
-            classNames: 'notes__row'
+            classNames: 'notes__row',
+            archived: this.archived
         }, this.values, {
             edit: (newData) => {
                 element.updateContent(newData);
