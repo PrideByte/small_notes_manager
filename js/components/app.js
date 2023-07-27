@@ -3,6 +3,7 @@ import DATA from "../database/data.js";
 import Element from "../core/default.js";
 import { DataArray } from "../model/model.js";
 import TableElement from "./table.js";
+import Modal from "./modal.js";
 
 export default class NotesApplication extends Element {
     constructor() {
@@ -15,7 +16,7 @@ export default class NotesApplication extends Element {
         this.sortData();
         this.data.onUpdate.addListener((e) => {
             this.sortData();
-            if (e.type === 'archive') {
+            if (e.type === 'archive' || e.type === 'update') {
                 if (e.element.archived) {
                     this.archivedTable.destroy();
                     this.data.onArchivedDataUpdate.removeListener(this.archivedTableDataUpdate);
@@ -29,6 +30,8 @@ export default class NotesApplication extends Element {
         });
 
         this.makeMainSection();
+        this.makeNewNoteButton();
+        // this.makeStatisticsSections();
         this.makeArchiveSection();
     }
 
@@ -75,11 +78,26 @@ export default class NotesApplication extends Element {
             parent,
             element: 'ul',
             classNames: 'notes__list',
-            dataFieldsToShow: ['name', 'created', 'category', 'content', 'dates', 'archived']
+            dataFieldsToShow: ['name', 'created', 'category', 'content', 'dates']
         }, data, {
             remove: (dataElement) => {
                 this.data.removeElement(dataElement);
             }
+        });
+    }
+
+    makeNewNoteButton() {
+        this.newNoteButton = new Element({
+            parent: this.element,
+            element: 'button',
+            classNames: 'notes__addbutton',
+            htmlContent: 'Add new note'
+        });
+        this.newNoteButton.addEvent('onclick', (event) => {
+            event.preventDefault();
+            new Modal(null, (newElement) => {
+                this.data.addElement(newElement);
+            });
         });
     }
 

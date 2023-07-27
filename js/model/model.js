@@ -3,7 +3,7 @@ import Signal from "../core/signal.js";
 export class DataModel {
     constructor(dataElement) {
         this.name = dataElement.name ?? 'Unnamed note';
-        this.created = dataElement.created ?? Date.now();
+        this.created = dataElement.created ?? new Date().toLocaleDateString('en-GB');
         this.category = dataElement.category ?? 'Uncategorized';
         this.content = dataElement.content;
         this.dates = dataElement.dates ?? [];
@@ -14,14 +14,17 @@ export class DataModel {
         this.onUpdate = new Signal();
     }
 
-    // updateContent(newContent) {
-    //     this.name = newContent.name.trim();
-    //     this.category = newContent.category;
-    //     this.content = newContent.content.trim();
-    //     this.foundDates();
+    updateContent(newContent) {
+        this.name = newContent.name ? newContent.name.trim() : this.name;
+        this.category = newContent.category ? newContent.category : this.category;
+        this.content = newContent.content ? newContent.content.trim() : this.content;
+        this.foundDates();
 
-    //     this.onUpdate.emit(this);
-    // }
+        this.onUpdate.emit({
+            type: 'update',
+            element: this
+        });
+    }
 
     foundDates() {
         this.dates = this.content.match(/(?:[0-2]\d|3[0-1]|(?<=\D)\d)\/(?:0?\d|1[0-2])\/\d{1,4}/g) ?? [];
@@ -57,11 +60,13 @@ export class DataArray {
         }, []);
     }
 
-    addElement(newElement) {
-        this.values.push(newElement);
+    addElement(newData) {
+        const newItem = new DataModel(newData);
+        newItem.onUpdate.addListener((e) => {this.onUpdate.emit(e)});
+        this.values.push(newItem);
         this.onUpdate.emit({
-            type: 'add',
-            element: newElement
+            type: 'update',
+            element: newData
         });
     }
     

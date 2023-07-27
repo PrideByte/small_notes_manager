@@ -5,7 +5,7 @@ const DATA = [
         category: 'Idea',
         content: '1) Lorem ipsum, dolor sit amet consectetur adipisicing elit.',
         dates: [],
-        archived: false
+        archived: true
     },
     {
         name: 'Second note',
@@ -35,9 +35,9 @@ const DATA = [
         name: 'Next note',
         created: '30/07/2016',
         category: 'Task',
-        content: 'I\'m gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021',
+        content: '5) I\'m gonna have a dentist appointment on the 3/5/2021, I moved it from 5/5/2021',
         dates: ['3/5/2021', '5/5/2021'],
-        archived: false
+        archived: true
     },
     {
         name: 'One more note',

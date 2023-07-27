@@ -1,4 +1,5 @@
 import Element from "../core/default.js";
+import Modal from "./modal.js";
 
 export default class TableRow extends Element {
     constructor(options, data, handlers) {
@@ -21,7 +22,7 @@ export default class TableRow extends Element {
                 parent: this.element,
                 element: this.header ? 'h4' : 'div',
                 classNames: 'notes__cell',
-                htmlContent: value
+                htmlContent: typeof value === 'string' ? value : value[1]
             }));
 
             this.cells[this.cells.length - 1].element.style.width = `${100 / Object.keys(this.data).length}%`;
@@ -46,7 +47,7 @@ export default class TableRow extends Element {
             classNames: 'notes__buttons-edit'
         });
         this.editButton.addEvent('onclick', (e) => {
-            console.log(this);
+            new Modal(this.data, this.handlers.edit);
         });
 
         this.archiveButton = new Element({

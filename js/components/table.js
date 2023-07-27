@@ -31,15 +31,16 @@ export default class TableElement extends Element {
             this.error = null;
         }
 
-        this.values = Object.entries(element)
-            .filter(([caption]) => this.dataFieldsToShow.includes(caption))
-            .map(([caption, value]) => value);
+        this.values = Object.entries(element).filter(([caption]) => this.dataFieldsToShow.includes(caption));
 
         this.newElement = new TableRow({
             parent: this.element,
             element: 'li',
             classNames: 'notes__row'
         }, this.values, {
+            edit: (newData) => {
+                element.updateContent(newData);
+            },
             archive: (row) => {
                 element.switchArchivedStatus();
             },
@@ -50,7 +51,7 @@ export default class TableElement extends Element {
         this.rows.push(this.newElement);
     }
 
-    checkData(from) {
+    checkData() {
         if (!this.data || !this.data.length) {
             this.showErrorMessage();
 
