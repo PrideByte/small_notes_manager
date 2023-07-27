@@ -1,35 +1,37 @@
 import Element from "../core/default.js";
 
 export default class TableRow extends Element {
-    constructor(options, data, handlers) {
+    constructor(options, data, actions) {
         super(options);
-        this.header = options.header ?? false;
+        this.cellsToShow = ['name', 'created', 'category', 'content', 'dates'];
+
         this.data = data;
         this.cells = [];
-        this.handlers = handlers ?? null;
+        this.tableHeader = options.tableHeader;
+        this.actions = actions;
 
-        this.fillCells();
+        if (!this.tableHeader) {
+            this.createDataRow();
+        }
 
-        if (!this.header) {
+        this.showRow();
+
+        if (!this.tableHeader) {
             this.showManagingButtons();
         }
     }
-    
-    fillCells() {
-        this.data.forEach(value => {
+
+    showRow() {
+        Object.entries(this.data).forEach(([caption, value]) => {
             this.cells.push(new Element({
-                parent: this.element,
-                element: this.header ? 'h4' : 'div',
+                parent: this.tableHeader ? this.element : this.dataRow.element,
+                element: this.tableHeader ? 'h4' : 'div',
                 classNames: 'notes__cell',
-                htmlContent: value
+                htmlContent: this.tableHeader ? caption : value
             }));
-    
+
             this.cells[this.cells.length - 1].element.style.width = `${100 / Object.keys(this.data).length}%`;
         });
-    }
-
-    removeCells() {
-        this.cells.forEach(item => item.destroy());
     }
 
     showManagingButtons() {
@@ -45,9 +47,7 @@ export default class TableRow extends Element {
             htmlContent: 'Edit note',
             classNames: 'notes__buttons-edit'
         });
-        this.editButton.addEvent('onclick', (e) => {
-            console.log(this);
-        });
+        this.editButton.addEvent('onclick', this.actions.edit);
         
         this.archiveButton = new Element({
             parent: this.buttonsRow.element,
@@ -56,9 +56,11 @@ export default class TableRow extends Element {
             classNames: 'notes__buttons-archive'
         });
         this.archiveButton.addEvent('onclick', (e) => {
-            this.handlers?.archive(this);
-            this.removeCells();
-            this.destroy();
+            this.actions.archive(e);
+            this.destroyDataRow();
+            this.createDataRow();
+            this.showRow();
+            // this.destroy();
         });
         
         this.removeButton = new Element({
@@ -68,9 +70,21 @@ export default class TableRow extends Element {
             classNames: 'notes__buttons-archive'
         });
         this.removeButton.addEvent('onclick', (e) => {
-            this.handlers?.remove(this);
-            this.removeCells();
+            this.actions.remove(e);
             this.destroy();
         });
+    }
+
+    createDataRow() {
+        this.dataRow = new Element({
+            parent: this.element,
+            element: null,
+            classNames: 'notes__data'
+        });
+        this.element.prepend(this.dataRow.element);
+    }
+
+    destroyDataRow() {
+        this.dataRow.destroy();
     }
 }

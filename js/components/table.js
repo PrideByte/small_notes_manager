@@ -2,47 +2,44 @@ import Element from "../core/default.js";
 import TableRow from "./row.js";
 
 export default class TableElement extends Element {
-    constructor(data, archived) {
-        super({
-            parent: document.body,
-            element: 'ul',
-            classNames: 'notes__wrapper'
-        });
-        this.archived = archived ?? false;
-        this.data = data ?? null;
-        this.getActualData();
+    constructor(options, data, handlers) {
+        super(options);
+        this.data = data;
+        this.handlers = handlers ?? null;
 
-        this.dataRows = [];
+        this.dataFieldsToShow = ['name', 'created', 'category', 'content', 'dates', 'archived'];
 
-        this.header = new TableRow({
+        this.rows = [];
+
+        new TableRow({
             parent: this.element,
             element: 'li',
             classNames: ['notes__row', 'notes__header'],
-            tableHeader: true
-        }, this.actualData[0]);
+            header: true
+        }, this.dataFieldsToShow);
 
-        this.actualData.forEach(dataElement => {
-            this.dataRows.push(new TableRow({
-                parent: this.element,
-                element: 'li',
-                classNames: 'notes__row',
-            }, dataElement, {
-                edit: (e) => { console.log('edit button', this); },
-                archive: (e) => {
-                    dataElement.switchArchivedStatus();
-                    this.getActualData();
-                },
-                remove: (e) => {
-                    this.data.removeElement(dataElement);
-                    this.getActualData();
-                }
-            }))
+        data.forEach(element => {
+            this.addElement(element);
         });
     }
 
-    getActualData() {
-        this.actualData = this.archived
-                        ? this.data.showActualData()
-                        : this.data.showArchivedData();
+    addElement(element) {
+        this.values = Object.entries(element)
+            .filter(([caption]) => this.dataFieldsToShow.includes(caption))
+            .map(([caption, value]) => value);
+
+        this.newElement = new TableRow({
+            parent: this.element,
+            element: 'li',
+            classNames: 'notes__row'
+        }, this.values, {
+            archive: (row) => {
+                element.switchArchivedStatus();
+            },
+            remove: (row) => {
+                this.handlers?.remove(element);
+            }
+        });
+        this.rows.push(this.newElement);
     }
 }

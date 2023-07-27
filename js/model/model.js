@@ -1,3 +1,5 @@
+import Signal from "../core/signal.js";
+
 export class DataModel {
     constructor(dataElement) {
         this.name = dataElement.name ?? 'Unnamed note';
@@ -6,10 +8,19 @@ export class DataModel {
         this.content = dataElement.content;
         this.dates = dataElement.dates ?? [];
         this.archived = dataElement.archived ?? false;
+
+        this.foundDates();
+
+        this.onUpdate = new Signal();
     }
 
     updateContent(newContent) {
-        this.content = String(newContent).trim();
+        this.name = newContent.name.trim();
+        this.category = newContent.category;
+        this.content = newContent.content.trim();
+        this.foundDates();
+
+        this.onUpdate.emit(this);
     }
 
     foundDates() {
@@ -18,6 +29,10 @@ export class DataModel {
 
     switchArchivedStatus() {
         this.archived = !this.archived;
+        this.onUpdate.emit({
+            type: 'archive',
+            element: this
+        });
     }
 
     getCellsToShow(cellList) {
@@ -30,25 +45,29 @@ export class DataModel {
 
 export class DataArray {
     constructor(rawData) {
+        this.onUpdate = new Signal();
+
         this.values = rawData.reduce((newData, dataElement) => {
-            newData.push(new DataModel(dataElement));
+            const newElement = new DataModel(dataElement);
+            newElement.onUpdate.addListener((e) => {this.onUpdate.emit(e)});
+            newData.push(newElement);
             return newData;
         }, []);
     }
 
     addElement(newElement) {
         this.values.push(newElement);
-    }
-
-    removeElement(elementToRemove) {
-        this.values = this.values.filter(element => element !== elementToRemove);
-    }
-
-    showActualData() {
-        return this.values.filter(element => !element.archived);
+        this.onUpdate.emit({
+            type: 'add',
+            element: newElement
+        });
     }
     
-    showArchivedData() {
-        return this.values.filter(element => element.archived);
+    removeElement(elementToRemove) {
+        this.values = this.values.filter(element => element !== elementToRemove);
+        this.onUpdate.emit({
+            type: 'remove',
+            element: elementToRemove
+        });
     }
 }

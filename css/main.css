@@ -10,20 +10,41 @@ ul, li {
 
 .notes__wrapper,
 .notes__header,
-.notes__data,
 .notes__row {
     width: 100%;
 }
 
-.notes__data,
+.notes__row,
 .notes__header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     flex-wrap: wrap;
+}
+
+.notes__header {
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+}
+
+.notes__row {
+    padding: 5px;
+}
+
+.notes__row:nth-child(2n) {
+    background-color: #ddd;
+}
+
+.notes__cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .notes__buttons {
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: stretch;
 }
