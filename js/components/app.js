@@ -18,9 +18,11 @@ export default class NotesApplication extends Element {
             if (e.type === 'archive') {
                 if (e.element.archived) {
                     this.archivedTable.destroy();
+                    this.data.onArchivedDataUpdate.removeListener(this.archivedTableDataUpdate);
                     this.makeArchiveTable();
                 } else {
                     this.mainTable.destroy();
+                    this.data.onActualDataUpdate.removeListener(this.mainTableDataUpdate);
                     this.makeMainTable();
                 }
             }
@@ -40,15 +42,13 @@ export default class NotesApplication extends Element {
     }
 
     makeMainTable() {
-        this.mainTable = new TableElement({
-            parent: this.mainSection.element,
-            element: 'ul',
-            classNames: 'notes__list'
-        }, this.mainData, {
-            remove: (dataElement) => {
-                this.data.removeElement(dataElement);
-            }
-        });
+        this.mainTable = this.createTable(this.mainSection.element, this.mainData);
+        this.data.onActualDataUpdate.addListener(this.mainTableDataUpdate);
+    }
+
+    mainTableDataUpdate = (actualData) => {
+        this.mainTable.data = actualData;
+        this.mainTable.checkData();
     }
 
     makeArchiveSection() {
@@ -61,11 +61,22 @@ export default class NotesApplication extends Element {
     }
 
     makeArchiveTable() {
-        this.archivedTable = new TableElement({
-            parent: this.archivedSection.element,
+        this.archivedTable = this.createTable(this.archivedSection.element, this.archivedData);
+        this.data.onArchivedDataUpdate.addListener(this.archivedTableDataUpdate);
+    }
+
+    archivedTableDataUpdate = (archivedData) => {
+        this.archivedTable.data = archivedData;
+        this.archivedTable.checkData();
+    }
+
+    createTable(parent, data) {
+        return new TableElement({
+            parent,
             element: 'ul',
-            classNames: 'notes__list'
-        }, this.archivedData, {
+            classNames: 'notes__list',
+            dataFieldsToShow: ['name', 'created', 'category', 'content', 'dates', 'archived']
+        }, data, {
             remove: (dataElement) => {
                 this.data.removeElement(dataElement);
             }
@@ -73,7 +84,7 @@ export default class NotesApplication extends Element {
     }
 
     sortData() {
-        this.mainData = this.data.values.filter(dataElement => !dataElement.archived);
-        this.archivedData = this.data.values.filter(dataElement => dataElement.archived);
+        this.mainData = this.data.getActualData();
+        this.archivedData = this.data.getArchivedData();
     }
 }

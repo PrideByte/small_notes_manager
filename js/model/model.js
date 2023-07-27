@@ -14,14 +14,14 @@ export class DataModel {
         this.onUpdate = new Signal();
     }
 
-    updateContent(newContent) {
-        this.name = newContent.name.trim();
-        this.category = newContent.category;
-        this.content = newContent.content.trim();
-        this.foundDates();
+    // updateContent(newContent) {
+    //     this.name = newContent.name.trim();
+    //     this.category = newContent.category;
+    //     this.content = newContent.content.trim();
+    //     this.foundDates();
 
-        this.onUpdate.emit(this);
-    }
+    //     this.onUpdate.emit(this);
+    // }
 
     foundDates() {
         this.dates = this.content.match(/(?:[0-2]\d|3[0-1]|(?<=\D)\d)\/(?:0?\d|1[0-2])\/\d{1,4}/g) ?? [];
@@ -46,6 +46,8 @@ export class DataModel {
 export class DataArray {
     constructor(rawData) {
         this.onUpdate = new Signal();
+        this.onActualDataUpdate = new Signal();
+        this.onArchivedDataUpdate = new Signal();
 
         this.values = rawData.reduce((newData, dataElement) => {
             const newElement = new DataModel(dataElement);
@@ -69,5 +71,17 @@ export class DataArray {
             type: 'remove',
             element: elementToRemove
         });
+    }
+
+    getActualData() {
+        const actualData = this.values.filter(dataElement => !dataElement.archived);
+        this.onActualDataUpdate.emit(actualData);
+        return actualData;
+    }
+    
+    getArchivedData() {
+        const archivedData = this.values.filter(dataElement => dataElement.archived);
+        this.onArchivedDataUpdate.emit(archivedData);
+        return archivedData;
     }
 }

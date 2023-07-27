@@ -45,7 +45,7 @@ const DATA = [
         category: 'Idea',
         content: '6) Съешь ещё этих мягких французских булок, да выпей чаю.',
         dates: [],
-        archived: true
+        archived: false
     },
     {
         name: 'Last note',
@@ -53,7 +53,7 @@ const DATA = [
         category: 'Idea',
         content: '7) Еще немного французских булок с чаем.',
         dates: [],
-        archived: true
+        archived: false
     }
 ];
 

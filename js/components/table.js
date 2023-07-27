@@ -7,7 +7,7 @@ export default class TableElement extends Element {
         this.data = data;
         this.handlers = handlers ?? null;
 
-        this.dataFieldsToShow = ['name', 'created', 'category', 'content', 'dates', 'archived'];
+        this.dataFieldsToShow = options.dataFieldsToShow;
 
         this.rows = [];
 
@@ -18,12 +18,19 @@ export default class TableElement extends Element {
             header: true
         }, this.dataFieldsToShow);
 
+        this.checkData();
+
         data.forEach(element => {
             this.addElement(element);
         });
     }
 
     addElement(element) {
+        if (this.error) {
+            this.error.destroy();
+            this.error = null;
+        }
+
         this.values = Object.entries(element)
             .filter(([caption]) => this.dataFieldsToShow.includes(caption))
             .map(([caption, value]) => value);
@@ -41,5 +48,23 @@ export default class TableElement extends Element {
             }
         });
         this.rows.push(this.newElement);
+    }
+
+    checkData(from) {
+        if (!this.data || !this.data.length) {
+            this.showErrorMessage();
+
+            return;
+        }
+    }
+
+    showErrorMessage() {
+        if (!this.error) {
+            this.error = new Element({
+                parent: this.element,
+                classNames: 'notes__error',
+                htmlContent: 'Now data to show!'
+            });
+        }
     }
 }

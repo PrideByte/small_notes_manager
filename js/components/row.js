@@ -14,7 +14,7 @@ export default class TableRow extends Element {
             this.showManagingButtons();
         }
     }
-    
+
     fillCells() {
         this.data.forEach(value => {
             this.cells.push(new Element({
@@ -23,7 +23,7 @@ export default class TableRow extends Element {
                 classNames: 'notes__cell',
                 htmlContent: value
             }));
-    
+
             this.cells[this.cells.length - 1].element.style.width = `${100 / Object.keys(this.data).length}%`;
         });
     }
@@ -48,7 +48,7 @@ export default class TableRow extends Element {
         this.editButton.addEvent('onclick', (e) => {
             console.log(this);
         });
-        
+
         this.archiveButton = new Element({
             parent: this.buttonsRow.element,
             element: 'button',
@@ -57,10 +57,9 @@ export default class TableRow extends Element {
         });
         this.archiveButton.addEvent('onclick', (e) => {
             this.handlers?.archive(this);
-            this.removeCells();
-            this.destroy();
+            this.removeRow();
         });
-        
+
         this.removeButton = new Element({
             parent: this.buttonsRow.element,
             element: 'button',
@@ -69,8 +68,13 @@ export default class TableRow extends Element {
         });
         this.removeButton.addEvent('onclick', (e) => {
             this.handlers?.remove(this);
-            this.removeCells();
-            this.destroy();
+            this.removeRow();
         });
+    }
+
+    removeRow() {
+        this.removeCells();
+        this.buttonsRow.destroy();
+        this.destroy();
     }
 }
