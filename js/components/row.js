@@ -24,7 +24,7 @@ export default class TableRow extends Element {
                 parent: this.element,
                 element: this.header ? 'h4' : 'div',
                 classNames: 'notes__cell',
-                htmlContent: typeof value === 'string' ? value : value[1]
+                htmlContent: typeof value === 'string' ? value : String(value[1]).replaceAll(/\n/g, '<br>')
             }));
 
             this.cells[this.cells.length - 1].element.style.width = `${100 / Object.keys(this.data).length}%`;
