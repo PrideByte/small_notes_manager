@@ -16,14 +16,16 @@ export default class TableElement extends Element {
             parent: this.element,
             element: 'li',
             classNames: ['notes__row', 'notes__header'],
-            header: true
+            header: true,
+            disableManagingButtons: true
         }, this.dataFieldsToShow);
 
-        this.checkData();
+        if (!this.isDataEmpty()) {
+            data.forEach(element => {
+                this.addElement(element);
+            });
+        }
 
-        data.forEach(element => {
-            this.addElement(element);
-        });
     }
 
     addElement(element) {
@@ -53,11 +55,11 @@ export default class TableElement extends Element {
         this.rows.push(this.newElement);
     }
 
-    checkData() {
+    isDataEmpty() {
         if (!this.data || !this.data.length) {
             this.showErrorMessage();
 
-            return;
+            return true;
         }
     }
 

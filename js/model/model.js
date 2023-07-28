@@ -27,7 +27,7 @@ export class DataModel {
     }
 
     foundDates() {
-        this.dates = this.content.match(/(?:(?<=\D)(?:[0-2]\d|3[0-1])|(?<=\D)\d)\/(?:0?\d|1[0-2])\/\d{1,4}(?=\D)|(?:(?<=\D)(?:[0-2]\d|3[0-1])|(?<=\D)\d)\.(?:0?\d|1[0-2])\.\d{1,4}(?=\D)/g) ?? [];
+        this.dates = this.content.match(/(?:(?<=\D)(?:[0-2]\d|3[0-1])|(?<=\D)\d)\/(?:0?\d|1[0-2])\/\d{1,4}(?=\D|$)|(?:(?<=\D)(?:[0-2]\d|3[0-1])|(?<=\D)\d)\.(?:0?\d|1[0-2])\.\d{1,4}(?=\D|$)/g) ?? [];
     }
 
     switchArchivedStatus() {
@@ -49,8 +49,6 @@ export class DataModel {
 export class DataArray {
     constructor(rawData) {
         this.onUpdate = new Signal();
-        this.onActualDataUpdate = new Signal();
-        this.onArchivedDataUpdate = new Signal();
 
         this.values = rawData.reduce((newData, dataElement) => {
             newData.push(this.createNewItem(dataElement));
@@ -81,14 +79,10 @@ export class DataArray {
     }
 
     getActualData() {
-        const actualData = this.values.filter(dataElement => !dataElement.archived);
-        this.onActualDataUpdate.emit(actualData);
-        return actualData;
+        return this.values.filter(dataElement => !dataElement.archived);
     }
     
     getArchivedData() {
-        const archivedData = this.values.filter(dataElement => dataElement.archived);
-        this.onArchivedDataUpdate.emit(archivedData);
-        return archivedData;
+        return this.values.filter(dataElement => dataElement.archived);
     }
 }

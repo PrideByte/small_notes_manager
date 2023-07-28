@@ -1,8 +1,9 @@
 import DATA from "../database/data.js";
 
-import Element from "../core/default.js";
 import { DataArray } from "../model/model.js";
+import Element from "../core/default.js";
 import TableElement from "./table.js";
+import StatisticsTableElement from "./statisticsTable.js";
 import Modal from "./modal.js";
 
 export default class NotesApplication extends Element {
@@ -19,19 +20,23 @@ export default class NotesApplication extends Element {
             if (e.type === 'archive' || e.type === 'update') {
                 if (e.element.archived) {
                     this.archivedTable.destroy();
-                    this.data.onArchivedDataUpdate.removeListener(this.archivedTableDataUpdate);
+                    this.mainTableDataUpdate(this.mainData);
                     this.makeArchiveTable();
                 } else {
                     this.mainTable.destroy();
-                    this.data.onActualDataUpdate.removeListener(this.mainTableDataUpdate);
+                    this.archivedTableDataUpdate(this.archivedData);
                     this.makeMainTable();
+                }
+            } else if (e.type === 'remove') {
+                if (e.element.archived) {
+                    this.archivedTableDataUpdate(this.archivedData);
+                } else {
+                    this.mainTableDataUpdate(this.mainData);
                 }
             }
         });
 
         this.makeMainSection();
-        this.makeNewNoteButton();
-        this.makeStatisticsSections();
         this.makeArchiveSection();
     }
 
@@ -42,16 +47,17 @@ export default class NotesApplication extends Element {
         });
 
         this.makeMainTable();
+        this.makeNewNoteButton();
+        this.makeStatisticsTable();
     }
 
     makeMainTable() {
         this.mainTable = this.createTable(this.mainSection.element, this.mainData);
-        this.data.onActualDataUpdate.addListener(this.mainTableDataUpdate);
     }
 
     mainTableDataUpdate = (actualData) => {
         this.mainTable.data = actualData;
-        this.mainTable.checkData();
+        this.mainTable.isDataEmpty();
     }
 
     makeArchiveSection() {
@@ -65,17 +71,15 @@ export default class NotesApplication extends Element {
 
     makeArchiveTable() {
         this.archivedTable = this.createTable(this.archivedSection.element, this.archivedData, true);
-        this.data.onArchivedDataUpdate.addListener(this.archivedTableDataUpdate);
     }
 
     archivedTableDataUpdate = (archivedData) => {
         this.archivedTable.data = archivedData;
-        this.archivedTable.checkData();
+        this.archivedTable.isDataEmpty();
     }
 
     createTable(parent, data, archived = false) {
-        return new TableElement({
-            parent,
+        const newTable = new TableElement({
             element: 'ul',
             classNames: 'notes__list',
             dataFieldsToShow: ['name', 'created', 'category', 'content', 'dates'],
@@ -85,11 +89,14 @@ export default class NotesApplication extends Element {
                 this.data.removeElement(dataElement);
             }
         });
+        parent.prepend(newTable.element);
+
+        return newTable;
     }
 
     makeNewNoteButton() {
         this.newNoteButton = new Element({
-            parent: this.element,
+            parent: this.mainSection.element,
             element: 'button',
             classNames: 'notes__addbutton',
             htmlContent: 'Add new note'
@@ -102,8 +109,12 @@ export default class NotesApplication extends Element {
         });
     }
 
-    makeStatisticsSections() {
-
+    makeStatisticsTable() {
+        this.statisticsTable = new StatisticsTableElement({
+            parent: this.mainSection.element,
+            element: 'ul',
+            classNames: 'notes__statistics'
+        }, this.data);
     }
 
     sortData() {

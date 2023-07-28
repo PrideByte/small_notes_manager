@@ -4,6 +4,7 @@ import Modal from "./modal.js";
 export default class TableRow extends Element {
     constructor(options, data, handlers) {
         super(options);
+        this.disableManagingButtons = options.disableManagingButtons ?? false;
         this.header = options.header ?? false;
         this.data = data;
         this.archived = options.archived;
@@ -12,7 +13,7 @@ export default class TableRow extends Element {
 
         this.fillCells();
 
-        if (!this.header) {
+        if (!this.disableManagingButtons) {
             this.showManagingButtons();
         }
     }
